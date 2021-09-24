@@ -6,6 +6,23 @@ const mainUser = {
     favs: [],
 }
 
+showMainFirst();
+async function showMainFirst(){
+    let paintingAr = JSON.parse(localStorage.getItem("Paintings"));
+    const data = await userFetching();
+    console.log(data)
+
+    let main = data.message.filter(main => main.id == mainUser.id);
+
+    let mainFavs = data.message.filter(user => user.id == mainUser.id);
+    console.log(mainFavs)
+    let mainFavsInt = mainFavs.map(function(item) {return parseInt(item, 10);});
+
+    document.querySelector("#frameContainer").append(loadingScreen("#frameContainer"));
+
+    return getPaintings(paintingAr, main, mainFavsInt, mainFavs);
+}
+
 async function userFetching(){
     document.querySelector("#userContainer").innerHTML = "";
     const response = await fetch("http://mpp.erikpineiro.se/dbp/sameTaste/users.php");
@@ -34,17 +51,20 @@ async function userFetching(){
 
         let mainFav = users.find(user => user.id == mainUser.id).favs;
 
+
         let common = n.favs.filter(fav => mainFav.includes(fav));
         // console.log(common)
         // console.log(n);
 
-        userDiv.innerHTML = `<span>${n.alias}</span> <span class="length">[${n.favs.length}]</span><span>(${common.length})</span>`;
-
+        if(main[0].id === n.id){
+            userDiv.innerHTML = `<span>${n.alias}</span> <span class="length">[${n.favs.length}]</span>`;
+        } else {
+            userDiv.innerHTML = `<span>${n.alias}</span> <span class="length">[${n.favs.length}]</span><span>(${common.length})</span>`;
+        }
         userDiv.addEventListener("click", (e) => {
             document.querySelector("#frameContainer").innerHTML = "";
             // console.log(userDiv.firstElementChild.innerHTML);
             let clickedUser = n.id;
-            console.log(n.id);
             // console.log(e.target.firstChild);
             let specificUser = data.message.find(user => user.id == `${clickedUser}`);
     
@@ -53,8 +73,7 @@ async function userFetching(){
     
                 return specificClickUser.includes((id.objectID))
             });
-            console.log(specificUser);
-            getPaintings(filteredUserFavs, specificUser, paintingArray, common, mainFav);
+            getPaintings(filteredUserFavs, specificUser, paintingArray, mainFav);
         });
     });
 
@@ -120,7 +139,7 @@ paintingFetching();
 const storagePaintings = JSON.parse(localStorage.getItem(`Paintings`));
 
 
-async function getPaintings(paintings, user, allPaintings, common, mainFav){
+async function getPaintings(paintings, user, allPaintings, mainFav){
     // console.log(user, paintings);
     const response = await fetch("http://mpp.erikpineiro.se/dbp/sameTaste/users.php");
     const data = await response.json();
@@ -163,11 +182,11 @@ async function getPaintings(paintings, user, allPaintings, common, mainFav){
 
         // console.log(mainFav);
 
-        if (common.includes(pain.objectID)){
-            frame.classList.add("sameFavorite");
-        } 
+        // if (common.includes(pain.objectID)){
+        //     frame.classList.add("sameFavorite");
+        // } 
 
-        if (!mainFav.includes(pain.objectID)){
+        if (mainFav.includes(pain.objectID)){
             frame.classList.add("favorite");
         }
 
