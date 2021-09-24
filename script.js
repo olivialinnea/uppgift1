@@ -22,6 +22,8 @@ async function userFetching(){
 
     let userDiv;
 
+    // console.log(main);
+
     let paintingArray = JSON.parse(localStorage.getItem("Paintings"));
 
     sortedUsers.forEach(n => {
@@ -34,13 +36,17 @@ async function userFetching(){
 
         let common = n.favs.filter(fav => mainFav.includes(fav));
         // console.log(common)
+        // console.log(n);
 
         userDiv.innerHTML = `<span>${n.alias}</span> <span class="length">[${n.favs.length}]</span><span>(${common.length})</span>`;
 
         userDiv.addEventListener("click", (e) => {
             document.querySelector("#frameContainer").innerHTML = "";
-            let clickedUser = e.target.firstChild.innerHTML;
-            let specificUser = data.message.find(user => user.alias == `${clickedUser}`);
+            // console.log(userDiv.firstElementChild.innerHTML);
+            let clickedUser = n.id;
+            console.log(n.id);
+            // console.log(e.target.firstChild);
+            let specificUser = data.message.find(user => user.id == `${clickedUser}`);
     
             let filteredUserFavs = paintingArray.filter((id) => { 
                 let specificClickUser = specificUser.favs.map(fave => parseInt(fave, 10))
@@ -48,7 +54,7 @@ async function userFetching(){
                 return specificClickUser.includes((id.objectID))
             });
             console.log(specificUser);
-            getPaintings(filteredUserFavs, specificUser, paintingArray, common);
+            getPaintings(filteredUserFavs, specificUser, paintingArray, common, mainFav);
         });
     });
 
@@ -114,8 +120,8 @@ paintingFetching();
 const storagePaintings = JSON.parse(localStorage.getItem(`Paintings`));
 
 
-async function getPaintings(paintings, user, allPaintings, common){
-    console.log(user, paintings);
+async function getPaintings(paintings, user, allPaintings, common, mainFav){
+    // console.log(user, paintings);
     const response = await fetch("http://mpp.erikpineiro.se/dbp/sameTaste/users.php");
     const data = await response.json();
 
@@ -123,13 +129,14 @@ async function getPaintings(paintings, user, allPaintings, common){
 
     let array;
 
-    if(user.id == mainUser.id){
+    if (user.id == mainUser.id){
         array = allPaintings;
     } else {
         array = paintings;
     }
     // console.log(array);
     // console.log(user);
+    // console.log(common);
 
     array.forEach(pain => {
         let div = document.createElement("div");
@@ -152,9 +159,15 @@ async function getPaintings(paintings, user, allPaintings, common){
         titleName.append(pain.title);
         aName.append(pain.artist);
         div.append(frame, titleName, aName);
-        console.log(pain)
+        // console.log(pain)
+
+        // console.log(mainFav);
 
         if (common.includes(pain.objectID)){
+            frame.classList.add("sameFavorite");
+        } 
+
+        if (!mainFav.includes(pain.objectID)){
             frame.classList.add("favorite");
         }
 
@@ -185,7 +198,7 @@ function addFavoriteWork(painID, user, favoritePaintings, users){
     let favoriteArray;
 
     if (!user){
-        user = users.find(user => user.id === mainUser.id);
+        user = users.find(user => user.id == mainUser.id);
         favoriteArray = user.favs;
     } else {
         favoriteArray = favoritePaintings.map(obj => obj.objectID);
@@ -204,15 +217,15 @@ function addFavoriteWork(painID, user, favoritePaintings, users){
 
     button.addEventListener("click", function (e){
         if (button.classList.contains("add")){
-            console.log("add");
+            // console.log("add");
 
             let click = e.target.nextElementSibling.firstElementChild.currentSrc;
-            console.log(e.target);
-            console.log(click);
-            console.log(artWorks);
+            // console.log(e.target);
+            // console.log(click);
+            // console.log(artWorks);
 
-            let findObjectID = artWorks.find(painting => click === painting.art);
-            console.log(findObjectID);
+            let findObjectID = artWorks.find(painting => click == painting.art);
+            // console.log(findObjectID);
 
             button.innerHTML = "REMOVE";
             button.classList.remove("add");

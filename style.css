@@ -17,6 +17,10 @@ body {
   display: flex;
 }
 
+p {
+  margin: 2px;
+}
+
 #userContainer {
   flex-basis: 20%;
   height: 700px;
@@ -79,8 +83,12 @@ body {
   background-color: gray;
 }
 
+.sameFavorite {
+  border: red 5px solid;
+}
+
 .favorite {
-  border: lime 5px solid;
+  border: green 5px solid;
 }
 
 .mainUser {
