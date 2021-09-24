@@ -33,6 +33,7 @@ async function userFetching(){
         let mainFav = users.find(user => user.id == mainUser.id).favs;
 
         let common = n.favs.filter(fav => mainFav.includes(fav));
+        // console.log(common)
 
         userDiv.innerHTML = `<span>${n.alias}</span> <span class="length">[${n.favs.length}]</span><span>(${common.length})</span>`;
 
@@ -47,7 +48,7 @@ async function userFetching(){
                 return specificClickUser.includes((id.objectID))
             });
             console.log(specificUser);
-            getPaintings(filteredUserFavs, specificUser, paintingArray);
+            getPaintings(filteredUserFavs, specificUser, paintingArray, common);
         });
     });
 
@@ -113,7 +114,7 @@ paintingFetching();
 const storagePaintings = JSON.parse(localStorage.getItem(`Paintings`));
 
 
-async function getPaintings(paintings, user, allPaintings){
+async function getPaintings(paintings, user, allPaintings, common){
     console.log(user, paintings);
     const response = await fetch("http://mpp.erikpineiro.se/dbp/sameTaste/users.php");
     const data = await response.json();
@@ -151,6 +152,11 @@ async function getPaintings(paintings, user, allPaintings){
         titleName.append(pain.title);
         aName.append(pain.artist);
         div.append(frame, titleName, aName);
+        console.log(pain)
+
+        if (common.includes(pain.objectID)){
+            frame.classList.add("favorite");
+        }
 
         if (user.id == mainUser.id){
         div.prepend(addFavoriteWork(pain.objectID, user, paintings, users));
