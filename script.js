@@ -22,6 +22,8 @@ async function userFetching(){
 
     let userDiv;
 
+    let paintingArray = JSON.parse(localStorage.getItem("Paintings"));
+
     sortedUsers.forEach(n => {
         userDiv = document.createElement("div");
         userDiv.classList.add("userDiv");
@@ -32,7 +34,7 @@ async function userFetching(){
 
         let common = n.favs.filter(fav => mainFav.includes(fav));
 
-        console.log(common.length);
+        // console.log(common.length);
 
         userDiv.innerHTML = `<span>${n.alias}</span> <span class="length">[${n.favs.length}]</span><span>(${common.length})</span>`;
 
@@ -46,12 +48,10 @@ async function userFetching(){
     
                 return specificClickUser.includes((id.objectID))
             });
-    
-            getPaintings(filteredUserFavs, specificUser);
+            console.log(specificUser);
+            getPaintings(filteredUserFavs, specificUser, paintingArray);
         });
     });
-
-    let paintingArray = JSON.parse(localStorage.getItem("Paintings"));
 
     return data;
 }
@@ -63,7 +63,7 @@ function loadingScreen(whichElement){
     let theList = document.querySelector(`${whichElement}`);
     let darkDiv = document.createElement("div");
     loadingDiv.innerHTML = `
-    <div class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+    <div class="loading">Fetching users...</div>
     `;
 
     darkDiv.classList.add("darkDiv");
@@ -115,14 +115,23 @@ paintingFetching();
 const storagePaintings = JSON.parse(localStorage.getItem(`Paintings`));
 
 
-async function getPaintings(paintings, user){
-
+async function getPaintings(paintings, user, allPaintings){
+    console.log(user, paintings);
     const response = await fetch("http://mpp.erikpineiro.se/dbp/sameTaste/users.php");
     const data = await response.json();
 
     let users = await data.message;
 
-    paintings.forEach(pain => {
+    let array;
+
+    if(user.id == mainUser.id){
+        array = allPaintings;
+    } else {
+        array = paintings;
+    }
+    console.log(array);
+
+    array.forEach(pain => {
         let div = document.createElement("div");
         div.classList.add("wrapperDiv");
         document.querySelector("#frameContainer").append(div);
@@ -139,12 +148,15 @@ async function getPaintings(paintings, user){
 
         titleName.append(pain.title);
         aName.append(pain.artist);
-        div.append(painting, titleName, aName); 
+        div.append(painting, titleName, aName);
+        
+        if (user.id == mainUser.id){
         div.prepend(addFavoriteWork(pain.objectID, user, paintings, users));
+        }
     })
 }
 
-getPaintings(storagePaintings);
+// getPaintings(storagePaintings);
 
 
 async function getArtInfo(objID){
@@ -171,8 +183,8 @@ function addFavoriteWork(painID, user, favoritePaintings, users){
         favoriteArray = favoritePaintings.map(obj => obj.objectID);
     }
 
-    console.log(favoriteArray.includes(painID));
-    console.log(favoriteArray);
+    // console.log(favoriteArray.includes(painID));
+    // console.log(favoriteArray);
 
     if (favoriteArray.includes(painID)){
         button.innerHTML = "REMOVE"

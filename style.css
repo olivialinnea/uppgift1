@@ -75,7 +75,7 @@ body {
   padding: 5px;
 }
 
-.lds-roller {
+/* .lds-roller {
   display: inline-block;
   position: absolute;
   width: 80px;
@@ -160,4 +160,4 @@ body {
   100% {
     transform: rotate(360deg);
   }
-}
+} */
