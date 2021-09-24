@@ -34,8 +34,6 @@ async function userFetching(){
 
         let common = n.favs.filter(fav => mainFav.includes(fav));
 
-        // console.log(common.length);
-
         userDiv.innerHTML = `<span>${n.alias}</span> <span class="length">[${n.favs.length}]</span><span>(${common.length})</span>`;
 
         userDiv.addEventListener("click", (e) => {
@@ -129,12 +127,14 @@ async function getPaintings(paintings, user, allPaintings){
     } else {
         array = paintings;
     }
-    console.log(array);
+    // console.log(array);
+    // console.log(user);
 
     array.forEach(pain => {
         let div = document.createElement("div");
         div.classList.add("wrapperDiv");
         document.querySelector("#frameContainer").append(div);
+        let frame = document.createElement("div");
         
         let painting = document.createElement("img");
         painting.src = pain.art;
@@ -145,11 +145,13 @@ async function getPaintings(paintings, user, allPaintings){
         painting.classList.add("painting");
         titleName.classList.add("title");
         aName.classList.add("aristName");
+        frame.classList.add("frame");
 
+        frame.append(painting);
         titleName.append(pain.title);
         aName.append(pain.artist);
-        div.append(painting, titleName, aName);
-        
+        div.append(frame, titleName, aName);
+
         if (user.id == mainUser.id){
         div.prepend(addFavoriteWork(pain.objectID, user, paintings, users));
         }
@@ -198,10 +200,13 @@ function addFavoriteWork(painID, user, favoritePaintings, users){
         if (button.classList.contains("add")){
             console.log("add");
 
-            let click = e.target.nextElementSibling.currentSrc;
+            let click = e.target.nextElementSibling.firstElementChild.currentSrc;
+            console.log(e.target);
+            console.log(click);
+            console.log(artWorks);
 
             let findObjectID = artWorks.find(painting => click === painting.art);
-            console.log(findObjectID.objectID);
+            console.log(findObjectID);
 
             button.innerHTML = "REMOVE";
             button.classList.remove("add");
@@ -232,7 +237,7 @@ function addFavoriteWork(painID, user, favoritePaintings, users){
             });
         }   else if (button.classList.contains("remove")){
                 console.log("remove");
-                let click = e.target.nextElementSibling.currentSrc;
+                let click = e.target.nextElementSibling.firstElementChild.currentSrc;
     
                 let findObjectID = artWorks.find(painting => click == painting.art);
                 console.log(findObjectID.objectID);
