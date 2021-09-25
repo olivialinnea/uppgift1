@@ -216,7 +216,7 @@ function addFavoriteWork(painID, user, favoritePaintings, users){
 
     let favoriteArray;
 
-    if (!user){
+    if (user){
         user = users.find(user => user.id == mainUser.id);
         favoriteArray = user.favs;
     } else {
@@ -225,8 +225,9 @@ function addFavoriteWork(painID, user, favoritePaintings, users){
 
     // console.log(favoriteArray.includes(painID));
     // console.log(favoriteArray);
+    let favoriteArrayInt = favoriteArray.map(function(item){ return parseInte(item, 10);});
 
-    if (favoriteArray.includes(painID)){
+    if (favoriteArrayInt.includes(painID)){
         button.innerHTML = "REMOVE"
         button.classList.add("remove");
     } else {
