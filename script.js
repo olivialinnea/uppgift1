@@ -10,15 +10,15 @@ showMainFirst();
 async function showMainFirst(){
     let paintingAr = JSON.parse(localStorage.getItem("Paintings"));
     const data = await userFetching();
-    console.log(data)
 
     let main = data.message.filter(main => main.id == mainUser.id);
 
     let mainFavs = data.message.filter(user => user.id == mainUser.id);
-    console.log(mainFavs)
+  
     let mainFavsInt = mainFavs.map(function(item) {return parseInt(item, 10);});
 
     document.querySelector("#frameContainer").append(loadingScreen("#frameContainer"));
+    console.log(mainFavs);
 
     return getPaintings(paintingAr, main, mainFavsInt, mainFavs);
 }
@@ -38,9 +38,9 @@ async function userFetching(){
     users.splice(21, 1);
 
     let userDiv;
-
+    let mainFavs = users.find(user => user.id == mainUser.id).favs;
+    let mainFavsInt = mainFavs.map(function(item) {return parseInt(item, 10);});
     // console.log(main);
-
     let paintingArray = JSON.parse(localStorage.getItem("Paintings"));
 
     sortedUsers.forEach(n => {
@@ -49,10 +49,15 @@ async function userFetching(){
         document.querySelector("#userContainer").append(userDiv);
         document.querySelector("#userContainer").firstChild.classList.add("mainUser");
 
-        let mainFav = users.find(user => user.id == mainUser.id).favs;
+        // let mainFav = users.find(user => user.id == mainUser.id).favs;
 
+        let numFavInt = n.favs.map(function(item) {return parseInt(item, 10);});
+        let commonFavs = numFavInt.filter(fav => mainFavsInt.includes(fav));
+        let commonFavsInt = commonFavs.map(function(item) {return parseInt(item, 10);});
 
-        let common = n.favs.filter(fav => mainFav.includes(fav));
+        let common = commonFavsInt.filter(fav => mainFavsInt.includes(fav));
+
+        // let common = n.favs.filter(fav => mainFav.includes(fav));
         // console.log(common)
         // console.log(n);
 
@@ -67,20 +72,30 @@ async function userFetching(){
             let clickedUser = n.id;
             // console.log(e.target.firstChild);
             let specificUser = data.message.find(user => user.id == `${clickedUser}`);
+
+            let mainFavPaintings = mainFavs.map(function(item){return parseInt(item,10);});
+            let specificUserFavs = specificUser.favs.map(fave => parseInt(fave, 10));
     
             let filteredUserFavs = paintingArray.filter((id) => { 
                 let specificClickUser = specificUser.favs.map(fave => parseInt(fave, 10))
-    
-                return specificClickUser.includes((id.objectID))
+
+                if (specificUser.id == mainUser.id){
+                    return mainFavPaintings;
+                } else {
+                    return specificClickUser.includes((id.objectID));
+                }
             });
-            getPaintings(filteredUserFavs, specificUser, paintingArray, mainFav);
+            getPaintings(filteredUserFavs, specificUser, paintingArray, common, specificUserFavs);
         });
     });
+
+    let allUsers = document.querySelectorAll(".userDiv");
+    allUsers[0].classList.add("userSelected");
 
     return data;
 }
 
-userFetching();
+// userFetching();
 
 function loadingScreen(whichElement){
     let loadingDiv = document.createElement("div");
@@ -187,7 +202,7 @@ async function getPaintings(paintings, user, allPaintings, mainFav){
         // } 
 
         if (mainFav.includes(pain.objectID)){
-            frame.classList.add("favorite");
+            div.classList.add("favorite");
         }
 
         if (user.id == mainUser.id){
@@ -225,7 +240,7 @@ function addFavoriteWork(painID, user, favoritePaintings, users){
 
     // console.log(favoriteArray.includes(painID));
     // console.log(favoriteArray);
-    let favoriteArrayInt = favoriteArray.map(function(item){ return parseInte(item, 10);});
+    let favoriteArrayInt = favoriteArray.map(function(item){ return parseInt(item, 10);});
 
     if (favoriteArrayInt.includes(painID)){
         button.innerHTML = "REMOVE"

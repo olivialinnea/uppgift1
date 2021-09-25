@@ -1,7 +1,7 @@
 body {
   height: 100vh;
 
-  background-color: skyblue;
+  background-color: #0d1f2d;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -10,43 +10,50 @@ body {
 }
 
 #wrapper {
-  border: 1px solid white;
   height: 700px;
   width: 1000px;
-  background-color: blanchedalmond;
+  background-color: #fae1df;
   display: flex;
+
+  border-radius: 10px;
 }
 
 p {
-  margin: 2px;
+  margin: 5px;
 }
 
 #userContainer {
-  flex-basis: 20%;
+  flex-basis: 200px;
   height: 700px;
   border: 1px solid black;
   overflow: auto;
+
+  border-radius: 10px;
+  font-family: "Josefin Sans", sans-serif;
 }
 
 #frameContainer {
   display: grid;
-  grid-template-columns: repeat(4, 195px);
-  grid-template-rows: auto;
-  grid-gap: 5px;
+  flex-grow: 1;
+  grid-template-columns: repeat(auto-fit, 215px);
+  grid-auto-rows: 250px;
+  grid-gap: 25px;
 
-  background-color: black;
+  background-color: #546a7b;
   overflow: scroll;
+
+  padding: 20px 20px 20px 50px;
 }
 
 #userContainer > div {
   flex-grow: 1;
-  border: 1px solid #000000;
+  border: 1px solid #546a7b;
   padding: 10px;
   cursor: pointer;
 }
 
 .userDiv:hover {
-  background-color: darkcyan;
+  background-color: #e4c3ad;
 }
 
 .frame {
@@ -56,6 +63,8 @@ p {
   justify-content: center;
   align-items: center;
   background-color: white;
+
+  border-radius: 5px;
 }
 
 .painting {
@@ -63,14 +72,26 @@ p {
   max-width: 90%;
 }
 
+.title {
+  font-family: "Josefin Sans", sans-serif;
+  font-size: 15px;
+}
+
+.aristName {
+  font-family: "Josefin Sans", sans-serif;
+  font-size: 12px;
+}
+
 .add,
 .remove {
-  width: 55px;
-  height: 25px;
   position: relative;
 
-  top: 0px;
+  top: 20px;
   cursor: pointer;
+  font-family: "Josefin Sans", sans-serif;
+  border-style: none;
+  padding: 1vh;
+  border-radius: 5px;
 }
 
 .wrapperDiv {
@@ -80,7 +101,9 @@ p {
   align-items: center;
 
   padding: 10px;
-  background-color: gray;
+
+  border-radius: 20px;
+  background-color: #9ea3b0;
 }
 
 .sameFavorite {
@@ -88,11 +111,11 @@ p {
 }
 
 .favorite {
-  border: green 5px solid;
+  box-shadow: 0 0 5px 5px #b5dda4;
 }
 
 .mainUser {
-  background-color: black;
+  background-color: #e4c3ad;
   color: white;
   font-weight: bold;
 }
