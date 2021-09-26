@@ -23,10 +23,21 @@ async function showMainFirst(){
     return getPaintings(paintingAr, main, mainFavsInt, mainFavs);
 }
 
-async function userFetching(){
-    document.querySelector("#userContainer").innerHTML = "";
+async function getUserApi(){
     const response = await fetch("http://mpp.erikpineiro.se/dbp/sameTaste/users.php");
     const data = await response.json();
+
+    return data;
+};
+
+getUserApi()
+    .then (data => showMainFirst(data));
+
+userFetching();
+async function userFetching(){
+    document.querySelector("#userContainer").innerHTML = "";
+    let paintingArray = JSON.parse(localStorage.getItem("Paintings"));
+    const data = await getUserApi();
 
     let users = data.message;
     // localStorage.setItem(`Users`, JSON.stringify(users));
@@ -41,16 +52,25 @@ async function userFetching(){
     let mainFavs = users.find(user => user.id == mainUser.id).favs;
     let mainFavsInt = mainFavs.map(function(item) {return parseInt(item, 10);});
     // console.log(main);
-    let paintingArray = JSON.parse(localStorage.getItem("Paintings"));
+
+    let userLoadingDiv = document.createElement("div");
+    userLoadingDiv.classList.add("userLoading");
+    userLoadingDiv.innerHTML = `
+    <div class="loading"><p>Updating users...<p></div>
+    `;
+    document.querySelector("#userContainer").append(userLoadingDiv);
+
+    setInterval(() => {
+        userLoadingDiv.remove();
+    }, 3000);
+
 
     sortedUsers.forEach(n => {
         userDiv = document.createElement("div");
         userDiv.classList.add("userDiv");
         document.querySelector("#userContainer").append(userDiv);
-        document.querySelector("#userContainer").firstChild.classList.add("mainUser");
 
         // let mainFav = users.find(user => user.id == mainUser.id).favs;
-
         let numFavInt = n.favs.map(function(item) {return parseInt(item, 10);});
         let commonFavs = numFavInt.filter(fav => mainFavsInt.includes(fav));
         let commonFavsInt = commonFavs.map(function(item) {return parseInt(item, 10);});
@@ -68,6 +88,12 @@ async function userFetching(){
         }
         userDiv.addEventListener("click", (e) => {
             document.querySelector("#frameContainer").innerHTML = "";
+
+            var active = document.querySelector(".userSelected");
+            active.classList.remove("userSelected");
+            document.querySelector("#userContainer").firstChild.classList.add("mainUser");
+            e.target.classList.add("userSelected");
+
             // console.log(userDiv.firstElementChild.innerHTML);
             let clickedUser = n.id;
             // console.log(e.target.firstChild);
@@ -99,19 +125,15 @@ async function userFetching(){
 
 function loadingScreen(whichElement){
     let loadingDiv = document.createElement("div");
+    loadingDiv.classList.add("loadingDiv")
     let theList = document.querySelector(`${whichElement}`);
-    let darkDiv = document.createElement("div");
     loadingDiv.innerHTML = `
-    <div class="loading">Fetching users...</div>
+    <div class="loading">Fetching paintings...</div>
     `;
-
-    darkDiv.classList.add("darkDiv");
-    theList.append(darkDiv);
-    darkDiv.append(loadingDiv);
+    theList.append(loadingDiv);
 
     setInterval(() => {
         loadingDiv.remove();
-        darkDiv.remove();
     }, 3000);
     return loadingDiv;
 }
@@ -121,33 +143,35 @@ setInterval(function(){
 }, 30000)
 
 async function paintingFetching(){
-    const response = await fetch(new Request('https://collectionapi.metmuseum.org/public/collection/v1/search?departmentId=11&q=snow'));
-    const data = await response.json();
+    if (localStorage.length == 0) {
+        const response = await fetch(new Request('https://collectionapi.metmuseum.org/public/collection/v1/search?departmentId=11&q=snow'));
+        const data = await response.json();
 
-    let artArray = [];
+        let artArray = [];
 
-    for (let i = 0; i < data.objectIDs.length; i++){
-        let id = data.objectIDs[i];
+        for (let i = 0; i < data.objectIDs.length; i++){
+            let id = data.objectIDs[i];
 
-        let art = getArtInfo(id);
-        artArray.push(art);
-    }
+            let art = getArtInfo(id);
+            artArray.push(art);
+        }
 
-    let artWorksPromises = await Promise.all(artArray);
-    let artWorksResponse = artWorksPromises.map(response => response.json())
-    let artWorks = await Promise.all(artWorksResponse);
+        let artWorksPromises = await Promise.all(artArray);
+        let artWorksResponse = artWorksPromises.map(response => response.json())
+        let artWorks = await Promise.all(artWorksResponse);
 
-    let sortedArtWorks = artWorks.sort((a,b) => a.artistDisplayName > b.artistDisplayName);
+        let sortedArtWorks = artWorks.sort((a,b) => a.artistDisplayName > b.artistDisplayName);
 
-    const mappedArtWorks = sortedArtWorks.map(obj => { return {
-        objectID: obj.objectID,
-        art: obj.primaryImageSmall,
-        title: obj.title,
-        artist: obj.artistDisplayName
-    }});
+        const mappedArtWorks = sortedArtWorks.map(obj => { return {
+            objectID: obj.objectID,
+            art: obj.primaryImageSmall,
+            title: obj.title,
+            artist: obj.artistDisplayName
+        }});
 
-    let stringedObj = JSON.stringify(mappedArtWorks);
-    localStorage.setItem(`Paintings`,`${stringedObj}`);
+        let stringedObj = JSON.stringify(mappedArtWorks);
+        localStorage.setItem(`Paintings`,`${stringedObj}`);
+        }
 }
 paintingFetching();
 
@@ -164,7 +188,7 @@ async function getPaintings(paintings, user, allPaintings, mainFav){
     let array;
 
     if (user.id == mainUser.id){
-        array = allPaintings;
+        array = paintings;
     } else {
         array = paintings;
     }
@@ -262,10 +286,6 @@ function addFavoriteWork(painID, user, favoritePaintings, users){
             let findObjectID = artWorks.find(painting => click == painting.art);
             // console.log(findObjectID);
 
-            button.innerHTML = "REMOVE";
-            button.classList.remove("add");
-            button.classList.add("remove");
-
             document.querySelector("#userContainer").append(loadingScreen("#userContainer"));
 
             fetch(new Request("http://mpp.erikpineiro.se/dbp/sameTaste/users.php", {
@@ -277,14 +297,22 @@ function addFavoriteWork(painID, user, favoritePaintings, users){
                 userFetching();
                 if (response.status == 409){
                     console.log("maximum favs reached");
+                    window.alert("Max antal favoriter uppnådd!");
                 } else if (response.status == 404){
                     console.log("use_ID finns inte i DB");
+                    window.alert("Användaren finns inte i databasen.");
                 } else if (response.status == 400) {
                     console.log("bad request: various");
                 } else if (response.status == 415){
                     console.log("skicka en JSON tack");
                 } else if (response.status == 200){
                     console.log("gick att lägga till");
+                    let buttonParent = e.target.parentElement;
+                    buttonParent.style.boxShadow = "0 0 5px 5px #b5dda4";
+
+                    button.innerHTML = "REMOVE";
+                    button.classList.remove("add");
+                    button.classList.add("remove");
                 } else {
                     return response.json();
                 }
@@ -295,10 +323,6 @@ function addFavoriteWork(painID, user, favoritePaintings, users){
     
                 let findObjectID = artWorks.find(painting => click == painting.art);
                 console.log(findObjectID.objectID);
-    
-                button.innerHTML = "ADD";
-                button.classList.remove("remove");
-                button.classList.add("add");
     
                 fetch(new Request("http://mpp.erikpineiro.se/dbp/sameTaste/users.php",
                 {
@@ -316,6 +340,12 @@ function addFavoriteWork(painID, user, favoritePaintings, users){
                         console.log("skicka en JSON TACK.");
                     } else if (response.status == 200){
                         console.log("borttagning gick bra.");
+                        let buttonParent = e.target.parentElement;
+                        buttonParent.style.boxShadow = "none";
+
+                        button.innerHTML = "ADD";
+                        button.classList.remove("remove");
+                        button.classList.add("add");
                     }
                     else {
                         return response.json();

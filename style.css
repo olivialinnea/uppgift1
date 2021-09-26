@@ -1,3 +1,7 @@
+* {
+  font-family: "Josefin Sans", sans-serif;
+}
+
 body {
   height: 100vh;
 
@@ -22,13 +26,17 @@ p {
   margin: 5px;
 }
 
+.mainUser {
+  color: white;
+  background-color: #9ea3b0;
+}
+
 #userContainer {
   flex-basis: 200px;
   height: 700px;
-  border: 1px solid black;
   overflow: auto;
 
-  border-radius: 10px;
+  border-radius: 0px 0px 0px 10px;
   font-family: "Josefin Sans", sans-serif;
 }
 
@@ -43,6 +51,7 @@ p {
   overflow: scroll;
 
   padding: 20px 20px 20px 50px;
+  border-radius: 0px 10px 10px 0px;
 }
 
 #userContainer > div {
@@ -73,12 +82,10 @@ p {
 }
 
 .title {
-  font-family: "Josefin Sans", sans-serif;
   font-size: 15px;
 }
 
 .aristName {
-  font-family: "Josefin Sans", sans-serif;
   font-size: 12px;
 }
 
@@ -88,7 +95,6 @@ p {
 
   top: 20px;
   cursor: pointer;
-  font-family: "Josefin Sans", sans-serif;
   border-style: none;
   padding: 1vh;
   border-radius: 5px;
@@ -114,7 +120,7 @@ p {
   box-shadow: 0 0 5px 5px #b5dda4;
 }
 
-.mainUser {
+.userSelected {
   background-color: #e4c3ad;
   color: white;
   font-weight: bold;
@@ -124,9 +130,34 @@ p {
   padding: 5px;
 }
 
-.loading {
-  width: 700px;
+.loadingDiv {
+  grid-column: 1 / span 3;
+  grid-row: 1 / span 7;
+
+  display: flex;
+  justify-content: center;
+
+  font-size: 30px;
+  color: white;
+}
+
+.loadingDiv {
+  position: relative;
+  top: 325px;
+}
+
+.userLoading {
   height: 700px;
+  display: flex;
+
+  justify-content: center;
+  align-items: center;
+
+  background-color: #fae1df;
+  color: black;
+
+  font-size: 20px;
+  border-radius: 10px 10px 0px 0px;
 }
 
 /* .lds-roller {
