@@ -124,6 +124,11 @@ p {
   padding: 5px;
 }
 
+.loading {
+  width: 700px;
+  height: 700px;
+}
+
 /* .lds-roller {
   display: inline-block;
   position: absolute;
