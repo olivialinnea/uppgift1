@@ -4,7 +4,7 @@ const mainUser = {
     id: 2,
     alias: "Olivia",
     favs: [],
-}
+};
 
 showMainFirst();
 async function showMainFirst(){
@@ -134,7 +134,7 @@ function loadingScreen(whichElement){
 
     setInterval(() => {
         loadingDiv.remove();
-    }, 3000);
+    }, 2500);
     return loadingDiv;
 }
 
